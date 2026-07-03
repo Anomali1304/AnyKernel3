@@ -17,7 +17,6 @@ supported.patchlevels=
 supported.vendorpatchlevels=
 '; } # end properties
 
-
 ### AnyKernel install
 
 # boot shell variables
@@ -31,10 +30,20 @@ PATCH_VBMETA_FLAG=auto
 
 ## Start boot install
 
-split_boot # Use split_boot to skip ramdisk unpack, e.g., for devices with init_boot ramdisk
+split_boot
 
-ui_print "- $(strings "${AKHOME}"/Image 2>/dev/null | grep -E -m1 'Linux version.*#' | awk '{print $3}')"
+# Baca versi kernel dari hasil split (sudah terdekompresi)
+KERNEL_VERSION=""
+if [ -f "$SPLITIMG/kernel" ]; then
+    KERNEL_VERSION=$(strings "$SPLITIMG/kernel" 2>/dev/null | grep -E -m1 'Linux version.*#' | awk '{print $3}')
+fi
 
-flash_boot # Use flash_boot to skip ramdisk repack, e.g., for devices with init_boot ramdisk
+if [ -n "$KERNEL_VERSION" ]; then
+    ui_print "- $KERNEL_VERSION"
+else
+    ui_print "- Kernel version not found"
+fi
+
+flash_boot
 
 ## End boot install
