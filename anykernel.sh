@@ -32,17 +32,7 @@ PATCH_VBMETA_FLAG=auto
 
 split_boot
 
-# Baca versi kernel dari hasil split (sudah terdekompresi)
-KERNEL_VERSION=""
-if [ -f "$SPLITIMG/kernel" ]; then
-    KERNEL_VERSION=$(strings "$SPLITIMG/kernel" 2>/dev/null | grep -E -m1 'Linux version.*#' | awk '{print $3}')
-fi
-
-if [ -n "$KERNEL_VERSION" ]; then
-    ui_print "- $KERNEL_VERSION"
-else
-    ui_print "- Kernel version not found"
-fi
+ui_print "- $(gzip -dc "${AKHOME}"/Image.gz 2>/dev/null | strings | grep -E -m1 'Linux version.*#' | awk '{print $3}')"
 
 flash_boot
 
