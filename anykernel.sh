@@ -32,7 +32,14 @@ PATCH_VBMETA_FLAG=auto
 
 split_boot
 
-ui_print "- $(gzip -dc "${AKHOME}"/Image.gz 2>/dev/null | strings | grep -E -m1 'Linux version.*#' | awk '{print $3}')"
+KERNEL_VERSION=""
+if [ -f "${AKHOME}/Image.gz" ] && gzip -t "${AKHOME}/Image.gz" 2>/dev/null; then
+  gzip -dc "${AKHOME}/Image.gz" > "${AKHOME}/.Image.version.tmp" 2>/dev/null
+  KERNEL_VERSION="$(strings "${AKHOME}/.Image.version.tmp" 2>/dev/null | grep -m1 -E 'Linux version.*#' | awk '{print $3}')"
+  rm -f "${AKHOME}/.Image.version.tmp"
+fi
+
+ui_print "- ${KERNEL_VERSION}"
 
 flash_boot
 
